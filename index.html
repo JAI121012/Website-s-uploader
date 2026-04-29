@@ -3,75 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>10G AI Platform</title>
+    <title>OMNI | AI Engine</title>
     <style>
-        :root { --neon: #00ffcc; --bg: #0a0a0a; }
-        body { margin: 0; background: var(--bg); color: white; font-family: sans-serif; display: flex; flex-direction: column; height: 100vh; }
-        nav { background: #000; padding: 10px; display: flex; gap: 10px; border-bottom: 2px solid var(--neon); }
-        .btn { background: none; border: 1px solid var(--neon); color: var(--neon); padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; }
-        .tab { display: none; flex: 1; padding: 15px; flex-direction: column; }
-        .active { display: flex; }
-        textarea { flex: 1; background: #000; color: var(--neon); border: 1px solid #333; padding: 15px; font-family: monospace; border-radius: 10px; outline: none; }
-        iframe { flex: 1; background: white; border-radius: 10px; border: none; margin-top: 10px; }
-        .ai-btn { background: #8e44ad; color: white; border: none; padding: 10px; margin-top: 5px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        :root { --neon: #00f2ff; --bg: #08080c; --card: #12121a; --text: #e0e0e0; }
+        * { box-sizing: border-box; transition: 0.3s; }
+        body { 
+            margin: 0; background: var(--bg); color: var(--text); 
+            font-family: 'Segoe UI', Roboto, sans-serif; height: 100vh; display: flex; flex-direction: column; 
+        }
+        
+        /* Glassmorphism Header */
+        nav { 
+            background: rgba(18, 18, 26, 0.8); backdrop-filter: blur(10px);
+            padding: 15px 20px; border-bottom: 1px solid rgba(0, 242, 255, 0.3);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .logo { font-weight: 900; letter-spacing: 2px; color: var(--neon); text-shadow: 0 0 10px var(--neon); }
+
+        /* Pro IDE Layout */
+        .main-container { flex: 1; display: flex; flex-direction: column; padding: 15px; gap: 15px; }
+        
+        #editor { 
+            flex: 1; background: var(--card); color: #80ffea; 
+            border: 1px solid #2d2d3d; border-radius: 12px; padding: 20px;
+            font-family: 'Fira Code', monospace; font-size: 14px; outline: none;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.5); resize: none;
+        }
+        #editor:focus { border-color: var(--neon); box-shadow: 0 0 15px rgba(0, 242, 255, 0.1); }
+
+        /* Action Bar */
+        .controls { display: flex; gap: 10px; }
+        .btn { 
+            flex: 1; padding: 12px; border-radius: 8px; border: none; cursor: pointer;
+            font-weight: bold; text-transform: uppercase; font-size: 12px;
+        }
+        .btn-ai { background: linear-gradient(45deg, #00f2ff, #0066ff); color: white; }
+        .btn-ai:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0, 242, 255, 0.4); }
+
+        /* Status Bar */
+        footer { 
+            background: #000; padding: 8px 20px; font-size: 11px; 
+            color: #666; display: flex; justify-content: space-between;
+        }
     </style>
 </head>
 <body>
 
 <nav>
-    <button class="btn" onclick="setTab('ide')">IDE</button>
-    <button class="btn" onclick="setTab('stats')">STATS</button>
+    <div class="logo">OMNI-V1</div>
+    <div style="font-size: 12px; opacity: 0.6;">3008MB EDGE ACTIVE</div>
 </nav>
 
-<div id="ide" class="tab active">
-    <textarea id="editor" oninput="run()" placeholder="Enter Code..."></textarea>
-    <button class="ai-btn" onclick="askAI()">✨ AI POWER UP (GEMINI)</button>
-    <iframe id="preview"></iframe>
-</div>
-
-<div id="stats" class="tab">
-    <div style="background:#161b22; padding:20px; border-radius:15px; border-left: 5px solid var(--neon);">
-        <h2>POWER: 10 Googolplexian</h2>
-        <p id="status">Status: System Healthy</p>
+<div class="main-container">
+    <textarea id="editor" spellcheck="false">/* Type your logic here... */</textarea>
+    
+    <div class="controls">
+        <button class="btn btn-ai" onclick="askAI()">✨ ACTIVATE OMNI AI</button>
     </div>
 </div>
 
+<footer>
+    <span id="status">SYSTEM READY</span>
+    <span>v2.0.4-PREVIEW</span>
+</footer>
+
 <script>
-    const editor = document.getElementById('editor');
-    const preview = document.getElementById('preview');
-
-    function run() {
-        localStorage.setItem('saved_code', editor.value);
-        const doc = preview.contentWindow.document;
-        doc.open(); doc.write(editor.value); doc.close();
-    }
-
-    window.onload = () => {
-        editor.value = localStorage.getItem('saved_code') || "<h1>Ready for AI Power</h1>";
-        run();
-    };
-
     async function askAI() {
+        const editor = document.getElementById('editor');
         const status = document.getElementById('status');
-        status.innerText = "Gemini AI is processing...";
+        status.innerText = "PROCESSING VIA OPENROUTER...";
+        status.style.color = "var(--neon)";
+
         try {
             const res = await fetch('/api/process', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ prompt: "Optimize this code: " + editor.value })
+                body: JSON.stringify({ prompt: editor.value })
             });
             const data = await res.json();
-            if(data.aiResponse) {
-                editor.value = data.aiResponse;
-                run();
-                status.innerText = "Status: AI Optimization Complete";
+            if(data.output) {
+                editor.value = data.output;
+                status.innerText = "AI OPTIMIZATION COMPLETE";
             }
-        } catch (e) { status.innerText = "Error: Check Vercel Key"; }
-    }
-
-    function setTab(t) {
-        document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
-        document.getElementById(t).classList.add('active');
+        } catch (e) {
+            status.innerText = "CONNECTION ERROR";
+            status.style.color = "#ff4444";
+        }
     }
 </script>
 </body>
