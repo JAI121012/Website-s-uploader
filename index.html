@@ -2,94 +2,164 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OMNI | AI Engine</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0">
+    <title>Omni Studio | VIP Edition</title>
+    
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/2103/2103633.png" type="image/png">
     <style>
-        :root { --neon: #00f2ff; --bg: #08080c; --card: #12121a; --text: #e0e0e0; }
-        * { box-sizing: border-box; transition: 0.3s; }
+        :root { 
+            --bg: #000000; 
+            --text: #f5f5f7; 
+            --accent: #0071e3; 
+            --border: #333333; 
+            --panel: #0a0a0a;
+        }
+
+        * { 
+            box-sizing: border-box; 
+            -webkit-font-smoothing: antialiased;
+            will-change: transform, opacity; /* Forces GPU Speed */
+        }
+
         body { 
             margin: 0; background: var(--bg); color: var(--text); 
-            font-family: 'Segoe UI', Roboto, sans-serif; height: 100vh; display: flex; flex-direction: column; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            height: 100vh; display: flex; flex-direction: column; overflow: hidden;
         }
-        
-        /* Glassmorphism Header */
+
+        /* Apple/Google Style Navbar */
         nav { 
-            background: rgba(18, 18, 26, 0.8); backdrop-filter: blur(10px);
-            padding: 15px 20px; border-bottom: 1px solid rgba(0, 242, 255, 0.3);
-            display: flex; justify-content: space-between; align-items: center;
+            height: 55px; display: flex; align-items: center; justify-content: space-between;
+            padding: 0 20px; border-bottom: 1px solid var(--border);
+            background: rgba(0,0,0,0.8); backdrop-filter: saturate(180%) blur(20px);
+            z-index: 100;
         }
-        .logo { font-weight: 900; letter-spacing: 2px; color: var(--neon); text-shadow: 0 0 10px var(--neon); }
+        .logo { font-weight: 600; font-size: 17px; letter-spacing: -0.5px; }
+        .chip { background: #1a1a1a; padding: 4px 12px; border-radius: 20px; font-size: 10px; color: #34c759; border: 1px solid #333; }
 
-        /* Pro IDE Layout */
-        .main-container { flex: 1; display: flex; flex-direction: column; padding: 15px; gap: 15px; }
+        /* Professional Split Workspace */
+        .workspace { display: flex; flex: 1; overflow: hidden; }
         
-        #editor { 
-            flex: 1; background: var(--card); color: #80ffea; 
-            border: 1px solid #2d2d3d; border-radius: 12px; padding: 20px;
-            font-family: 'Fira Code', monospace; font-size: 14px; outline: none;
-            box-shadow: inset 0 0 15px rgba(0,0,0,0.5); resize: none;
+        .editor-container { 
+            flex: 1; display: flex; flex-direction: column; 
+            border-right: 1px solid var(--border); background: var(--panel);
         }
-        #editor:focus { border-color: var(--neon); box-shadow: 0 0 15px rgba(0, 242, 255, 0.1); }
+        
+        #codeEditor { 
+            flex: 1; background: transparent; color: #00f2ff; border: none;
+            padding: 20px; font-family: "SF Mono", "Fira Code", monospace; 
+            font-size: 14px; line-height: 1.6; outline: none; resize: none;
+        }
 
-        /* Action Bar */
-        .controls { display: flex; gap: 10px; }
-        .btn { 
-            flex: 1; padding: 12px; border-radius: 8px; border: none; cursor: pointer;
-            font-weight: bold; text-transform: uppercase; font-size: 12px;
-        }
-        .btn-ai { background: linear-gradient(45deg, #00f2ff, #0066ff); color: white; }
-        .btn-ai:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0, 242, 255, 0.4); }
+        .preview-container { flex: 1; background: #fff; position: relative; }
+        iframe { width: 100%; height: 100%; border: none; }
 
-        /* Status Bar */
-        footer { 
-            background: #000; padding: 8px 20px; font-size: 11px; 
-            color: #666; display: flex; justify-content: space-between;
+        /* VIP Control Bar */
+        .toolbar { 
+            height: 60px; display: flex; align-items: center; padding: 0 20px;
+            background: #000; border-top: 1px solid var(--border); gap: 12px;
         }
+        
+        .btn-vip { 
+            background: var(--accent); color: white; border: none; 
+            padding: 10px 24px; border-radius: 980px; font-weight: 500;
+            font-size: 13px; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-vip:active { transform: scale(0.96); opacity: 0.8; }
+        
+        .btn-secondary {
+            background: transparent; border: 1px solid var(--border); color: var(--text);
+            padding: 8px 18px; border-radius: 980px; font-size: 12px; cursor: pointer;
+        }
+
+        #status-log { font-size: 11px; color: #666; margin-left: auto; text-transform: uppercase; letter-spacing: 1px; }
     </style>
 </head>
 <body>
 
 <nav>
-    <div class="logo">OMNI-V1</div>
-    <div style="font-size: 12px; opacity: 0.6;">3008MB EDGE ACTIVE</div>
+    <div class="logo">OMNI <span style="font-weight:300; opacity:0.5;">STUDIO</span></div>
+    <div class="chip">● 2048MB CLOUD ACTIVE</div>
 </nav>
 
-<div class="main-container">
-    <textarea id="editor" spellcheck="false">/* Type your logic here... */</textarea>
-    
-    <div class="controls">
-        <button class="btn btn-ai" onclick="askAI()">✨ ACTIVATE OMNI AI</button>
+<div class="workspace">
+    <div class="editor-container">
+        <textarea id="codeEditor" spellcheck="false" placeholder="Build something incredible..."></textarea>
+    </div>
+    <div class="preview-container">
+        <iframe id="livePreview"></iframe>
     </div>
 </div>
 
-<footer>
-    <span id="status">SYSTEM READY</span>
-    <span>v2.0.4-PREVIEW</span>
-</footer>
+<div class="toolbar">
+    <button class="btn-vip" onclick="askGemini()">⚡ AI SOLVE</button>
+    <button class="btn-secondary" onclick="resetProject()">Reset</button>
+    <div id="status-log">System Optimized</div>
+</div>
 
 <script>
-    async function askAI() {
-        const editor = document.getElementById('editor');
-        const status = document.getElementById('status');
-        status.innerText = "PROCESSING VIA OPENROUTER...";
-        status.style.color = "var(--neon)";
+    const editor = document.getElementById('codeEditor');
+    const preview = document.getElementById('livePreview');
+    const log = document.getElementById('status-log');
+
+    // High-Speed Rendering Engine
+    function sync() {
+        const start = performance.now();
+        const doc = preview.contentWindow.document;
+        doc.open();
+        doc.write(editor.value);
+        doc.close();
+        const end = performance.now();
+        
+        log.innerText = `Render: ${(end - start).toFixed(1)}ms`;
+        localStorage.setItem('omni_vip_data', editor.value);
+    }
+
+    editor.addEventListener('input', sync);
+
+    // Initial Load
+    window.onload = () => {
+        const saved = localStorage.getItem('omni_vip_data');
+        editor.value = saved || "\n<style>\n  body { background: #f4f4f7; display: flex; justify-content: center; align-items: center; height: 100vh; font-family: sans-serif; }\n  .card { background: white; padding: 40px; border-radius: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); }\n</style>\n<div class='card'>\n  <h1>Omni Is Ready.</h1>\n  <p>Tap AI Solve to optimize this.</p>\n</div>";
+        sync();
+    };
+
+    // AI Bridge to OpenRouter/Gemini
+    async function askGemini() {
+        log.innerText = "Gemini AI Thinking...";
+        log.style.color = "var(--accent)";
 
         try {
             const res = await fetch('/api/process', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ prompt: editor.value })
+                body: JSON.stringify({ prompt: "Rewrite this code to be professional, clean, and bug-free: " + editor.value })
             });
             const data = await res.json();
             if(data.output) {
                 editor.value = data.output;
-                status.innerText = "AI OPTIMIZATION COMPLETE";
+                sync();
+                log.innerText = "Optimization Successful";
+                log.style.color = "#34c759";
             }
         } catch (e) {
-            status.innerText = "CONNECTION ERROR";
-            status.style.color = "#ff4444";
+            log.innerText = "AI Bridge Offline";
+            log.style.color = "#ff3b30";
         }
     }
+
+    function resetProject() {
+        if(confirm("Permanently wipe memory?")) {
+            localStorage.clear();
+            location.reload();
+        }
+    }
+
+    // VIP Autosave (Every 1 second)
+    setInterval(() => {
+        localStorage.setItem('omni_vip_backup', editor.value);
+    }, 1000);
 </script>
 </body>
 </html>
+
